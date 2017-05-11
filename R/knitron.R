@@ -97,7 +97,7 @@ knitron.is_running <- function(profile = "knitr") {
   args <- paste(.knitron_env$knitron_wrapper, profile, "isrunning")
   flog.debug(paste("Executing", python, args), name = "knitron")
   res <- system2(python, args, wait = TRUE, stdout = TRUE, stderr = TRUE)
-  tail(res, 1) == "True"
+  grepl("True",tail(res, 1))
 }
 
 #' Execute a code chunk from a knitr option list
