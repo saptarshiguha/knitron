@@ -48,14 +48,23 @@ knitron.start <- function(profile = "knitr", wait = TRUE) {
 #' @param profile the name of the profile
 #' @export
 knitron.checkversion <- function(profile) {
-  python <- getOption("ipython", "ipython")
+  python <- getOption("python", "python")
   ipcluster <- getOption("ipcluster", "ipcluster")
   ipcluster_version <- knitron.execute_code("'import sys;print(sys.version_info.major)'",
                                             profile)
   ipython_version <- system2(python,
                              "-c 'import sys;print(sys.version_info.major)'",
                              stdout = TRUE)
-  
+  python <- getOption("ipython", "ipython")
+  ipython2_version <- system2(python,
+                             "-c 'import sys;print(sys.version_info.major)'",
+                             stdout = TRUE)
+
+  if(getOption("knitron.debug",FALSE)){
+      print(ipcluster_version )
+      print(ipython_version)
+      print(ipython2_version)
+  }
   if (ipcluster_version != ipython_version) {
     flog.warn(paste("Version mismatch: ", python, " has version ", ipython_version,
                     ", but ", ipcluster, " is of version ", ipcluster_version, ". ",
@@ -93,10 +102,13 @@ knitron.is_running <- function(profile = "knitr") {
   } else {
     return(FALSE)
   }
-  
+  python <- getOption("python", "python")
   args <- paste(.knitron_env$knitron_wrapper, profile, "isrunning")
   flog.debug(paste("Executing", python, args), name = "knitron")
   res <- system2(python, args, wait = TRUE, stdout = TRUE, stderr = TRUE)
+  if(getOption("knitron.debug",FALSE)){
+      print(res)
+  }
   grepl("True",tail(res, 1))
 }
 
@@ -109,7 +121,7 @@ knitron.is_running <- function(profile = "knitr") {
 knitron.execute_chunk <- function(options, profile = "knitr") {
   json_file <- tempfile()
   args <- paste(.knitron_env$knitron_wrapper, profile, "chunk", json_file)
-  python <- getOption("ipython", "ipython")
+  python <- getOption("python", "python")
   flog.debug(paste("Executing code chunk via", python, args), name = "knitron")
   if(getOption("knitron.debug",FALSE)==TRUE){
       print(options)
@@ -128,9 +140,9 @@ knitron.execute_chunk <- function(options, profile = "knitr") {
 #' @return the command's stdout and stderr
 #' @export
 knitron.execute_code <- function(code, profile = "knitr") {
-  args <- paste(.knitron_env$knitron_wrapper, profile, "code", code)
-  python <- getOption("ipython", "ipython")
-  flog.debug(paste("Executing", code, "via", python, args), name = "knitron")
+  args <- paste(knitron:::.knitron_env$knitron_wrapper, profile, "code", code)
+  python <- getOption("python", "python")
+  message(paste("Executing", code, "via", python, args))
   system2(python, args, wait = TRUE, stdout = TRUE, stderr = TRUE)
 }
 
@@ -181,7 +193,7 @@ eng_ipython = function(options) {
     return(knitr::engine_output(options, options$code, NULL, NULL))
   
   ##knitron.checkversion(profile)
-  warning("temporarily removed python version checking")
+  ##warning("temporarily removed python version checking")
   
   result <- knitron.execute_chunk(koptions, profile)
 
