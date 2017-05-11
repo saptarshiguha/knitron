@@ -111,7 +111,7 @@ knitron.execute_chunk <- function(options, profile = "knitr") {
   args <- paste(.knitron_env$knitron_wrapper, profile, "chunk", json_file)
   python <- getOption("ipython", "ipython")
   flog.debug(paste("Executing code chunk via", python, args), name = "knitron")
-  if(getOption("knitr.debug",FALSE)==TRUE){
+  if(getOption("knitron.debug",FALSE)==TRUE){
       print(options)
       print(args)
     }
