@@ -8,6 +8,9 @@
                 assign.env = .knitron_env)
   
   knitr::knit_engines$set(ipython = eng_ipython)
+  if(getOption("knitron.python_engine",TRUE)){
+    knitr::knit_engines$set(python = eng_ipython)
+   }
   futile.logger::flog.logger("knitron", DEBUG, layout = layout.format("knitron/~l ~m"))
   
   # Kill all kernels when an R session ends.
