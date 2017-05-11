@@ -111,6 +111,10 @@ knitron.execute_chunk <- function(options, profile = "knitr") {
   args <- paste(.knitron_env$knitron_wrapper, profile, "chunk", json_file)
   python <- getOption("ipython", "ipython")
   flog.debug(paste("Executing code chunk via", python, args), name = "knitron")
+  if(getOptions("knitr.debug",FALSE)==TRUE){
+      print(options)
+      print(args)
+    }
   out <- system2(python, args, input = jsonlite::toJSON(options, auto_unbox = TRUE),
                  wait = TRUE, stdout = TRUE, stderr = TRUE)
   cat(paste(out, collapse=""))
